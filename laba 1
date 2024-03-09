@@ -1,12 +1,39 @@
 Нечетные двоичные числа, не превышающие 409610, в которых встречается ровно одна серия из трех подряд идущих нуля. Выводит на экран цифры числа, исключая нули. Отдельно выводится прописью номер позиции, с которой начинается эта серия.
 
-i = 0
-for n in range(1, 4096):
-    if n % 2 != 0:
-        b = bin(n)[2:]
-        i += 1
-        r = int(b, 2)
-        s = str(b)
+d_db = {'0': 'ноль', '1': 'один'}
 
-        if s.count("000") < 2:
-            print(i, b, r)
+bin_words = []
+def procesBinNum(num):
+    num_str = str(num)
+    start_idx = 0
+    for i in range(len(num_str) - 2):
+        if num_str[i] == '1' and num_str[i + 1] == '1' and num_str[i + 2] == '1':
+            start_idx = i
+            break
+
+    out = []
+    for idx, d in enumerate(num_str):
+        if d != '0':
+            out.append(d_db[d])
+
+    print("Число без нулей:", ' '.join(out))
+    print(f'Позиция начала серии "000": {start_idx}')
+
+file = open("C://Users//User//Desktop//ура.txt", "r")
+while True:
+    a = file.readline().split()
+    if not a:
+        print("\nФайл ура.txt в директории проекта закончился.")
+        break
+    for val in a:
+        if all('0' <= number <= '1' for number in val):
+            print('Значение val', val)
+            if int(val) % 2 == 1 and int(val) <= 4096:
+                print(f'Обработка числа : {val}')
+                procesBinNum(val)
+                print('-' * 30)
+            else:
+                print(f'Не удовлетворяет условиям: {a}')
+        else:
+            print(f'Ошибка: неверный формат числа')
+            
