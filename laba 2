@@ -11,7 +11,7 @@ file = open("C://Users//User//Desktop//ура.txt", "r")         #открыва
     for i in file:
         index = 0
         line = i.rstrip()                            
-        if re.fullmatch('[0-1]*11[0-1]*', line):
+        if re.fullmatch('[0-1]*000[0-1]*', line):
             print("Число:", i)
             for i in re.finditer('000', line):
                 index = i.start()
