@@ -4,14 +4,11 @@
 Нечетные двоичные числа, не превышающие 409610, в которых встречается ровно одна серия из трех подряд идущих нуля. Выводит на экран цифры числа, исключая нули. Отдельно выводится прописью номер позиции, с которой начинается эта серия.
 
 import re
-
-file = open("C://Users//User//Desktop//ура.txt", "r")         #открываем файл
-    line = file.readline()                                    #читаем строку
-
-    for i in file:
+ 
+for i in file:                                                           #открываем файл
         index = 0
-        line = i.rstrip()                            
-        if re.fullmatch('[0-1]*000[0-1]*', line):
+        line = i.rstrip()                                                #читаем строку
+        if re.fullmatch('.*0{3}[^0]*', line):
             print("Число:", i)
             for i in re.finditer('000', line):
                 index = i.start()
