@@ -1,0 +1,166 @@
+С клавиатуры вводится два числа K и N. Квадратная матрица А(N,N), состоящая из 4-х равных по размерам подматриц, B,C,D,E заполняется случайным образом целыми числами в интервале [-10,10]. Для тестирования использовать не случайное заполнение, а целенаправленное.
+
+Для ИСТд-12 вид матрицы А
+Е	В
+D	С
+
+  1
+4   2
+  3
+
+17.	Формируется матрица F следующим образом: если в Е количество нулей в нечетных столбцах в области 4 больше, чем сумма чисел в нечетных строках в области 1, то поменять в Е симметрично области 1 и 2 местами, иначе С и Е поменять местами несимметрично. При этом матрица А не меняется. После чего вычисляется выражение: (К*(A*F)– K*AT . Выводятся по мере формирования А, F и все матричные операции последовательно.
+
+
+import random
+
+k = int(input())
+n = int(input())
+e = [[0] * (n // 2) for _ in range(n // 2)]
+b = [[0] * (n // 2) for _ in range(n // 2)]
+c = [[0] * (n // 2) for _ in range(n // 2)]
+d = [[0] * (n // 2) for _ in range(n // 2)]
+for i in range(n // 2):
+    for j in range(n // 2):
+        e[i][j] = random.randint(-10, 10)
+        b[i][j] = random.randint(-10, 10)
+        c[i][j] = random.randint(-10, 10)
+        d[i][j] = random.randint(-10, 10)
+
+a = [[0] * n for _ in range(n)]
+for i in range(n // 2):
+    for j in range(n // 2):
+        a[i][j] = e[i][j]
+for i in range(n // 2, n):
+    for j in range(n // 2):
+        a[i][j] = d[i - n // 2][j]
+for i in range(n // 2):
+    for j in range(n // 2, n):
+        a[i][j] = b[i][j - n // 2]
+for i in range(n // 2, n):
+    for j in range(n // 2, n):
+        a[i][j] = c[i - n // 2][j - n // 2]
+
+print("Матрица A")
+for i in range(len(a)):
+    for j in range(len(a)):
+        print("{:4d}".format(a[i][j]), end=' ')
+    print()
+print()
+
+
+countE4 = 0
+for i in range(1, len(e), 2):
+    if i <= len(e) // 2 + 1:
+        for j in range(0, i + 1):
+            if j % 2 != 0:
+        if e[j][i] == 0:
+                countE4 += 1
+    else:
+        for j in range(0, len(e)):
+            if e[j][i] == 0:
+                countE4 += 1
+print("Количество нулей в нечетных столбцах:", countE4)
+
+countE1 = 1
+for i in range(1, len(e), 2):
+    if i < len(e) // 2 + 1:
+        for j in range(0, i + 1):
+            countE1 += e[i][j]
+    else:
+        for j in range(0, len(e)):
+            countE1 += e[i][j]
+print("Сумма чисел в области 1: ", countE1)
+
+f = [[0] * n for _ in range(n)]
+if countE4 > countE1:
+    change = [[False] * (n // 2) for _ in range(n // 2)]
+    for i in range(len(e)):
+        for j in range(len(e)):
+            if i + j >= len(e) - 1 and change[i][j] == False:
+                e[i][j], e[j][i] = e[j][i], e[i][j]
+                change[i][j] = change[j][i] = True
+    for i in range(n // 2):
+        for j in range(n // 2):
+            f[i][j] = e[i][j]
+    for i in range(n // 2, n):
+        for j in range(n // 2):
+            f[i][j] = d[i - n // 2][j]
+    for i in range(n // 2):
+        for j in range(n // 2, n):
+            f[i][j] = b[i][j - n // 2]
+    for i in range(n // 2, n):
+        for j in range(n // 2, n):
+            f[i][j] = c[i - n // 2][j - n // 2]
+else:
+    for i in range(n // 2):
+        for j in range(n // 2):
+            f[i][j] = c[i][j]
+    for i in range(n // 2, n):
+        for j in range(n // 2):
+            f[i][j] = d[i - n // 2][j]
+    for i in range(n // 2, n):
+        for j in range(n // 2, n):
+            f[i][j] = e[i - n // 2][j - n // 2]
+    for i in range(n // 2):
+        for j in range(n // 2, n):
+            f[i][j] = b[i][j - n // 2]
+
+print("Матрица F, созданная по условию")
+for i in range(len(f)):
+    for j in range(len(f)):
+        print("{:4d}".format(f[i][j]), end=' ')
+    print()
+print()
+
+
+answer = [[0] * n for _ in range(n)]
+for i in range(n):
+    for j in range(n):
+        for k in range(n):
+            answer[i][j] += a[i][k] * f[k][j]
+
+print("Матрица A*F")
+for i in range(len(answer)):
+    for j in range(len(answer)):
+        print("{:4d}".format(answer[i][j]), end=' ')
+    print()
+print()
+
+for i in range(len(answer)):
+    for j in range(len(answer)):
+        answer[i][j] *= k
+print("Матрица K*(A*F)")
+for i in range(len(answer)):
+    for j in range(len(answer)):
+        print("{:4d}".format(answer[i][j]), end=' ')
+    print()
+print()
+
+
+change = [[False] * (n) for _ in range(n)]
+for i in range(len(f)):
+    for j in range(len(f)):
+        if change[i][j] == False:
+            f[i][j], f[j][i] = f[j][i], f[i][j]
+            change[i][j] = change[j][i] = True
+
+
+print("Матрица A^T")
+for i in range(len(a)):
+    for j in range(len(a)):
+        print("{:4d}".format(a[i][j]), end=' ')
+    print()
+print()
+
+answer1 = [[0] * n for _ in range(n)]
+for i in range(n):
+    for j in range(n):
+        for k in range(n):
+            answer1[i][j] += answer[i][k] - k*a[k][j]
+print("Матрица (K*(A*F))-K*A^T")
+for i in range(len(answer1)):
+    for j in range(len(answer1)):
+        print("{:4d}".format(answer1[i][j]), end=' ')
+    print()
+print()
+
