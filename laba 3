@@ -48,27 +48,33 @@ for i in range(len(a)):
     print()
 print()
 
-
 countE4 = 0
-for i in range(1, len(e), 2):
-    if i <= len(e) // 2 + 1:
-        for j in range(0, i + 1):
-            if j % 2 != 0:
-              if e[j][i] == 0:
+for i in range(n // 2):
+    for j in range(i):
+        if j % 2 != 0:
+            if e[i][j] == 0:
                 countE4 += 1
-    else:
-        for j in range(0, len(e)):
-                countE4 += 1
+for i in range(n // 2, n):
+    for j in range(n - (i + 1)):
+        if e[i][j] == 0:
+            countE4 += 1
+else:
+    for j in range(0, len(e) - i):
+        if e[i][j] == 0:
+            countE4 += 1
 print("Количество нулей в нечетных столбцах:", countE4)
 
 countE1 = 1
-for i in range(1, len(e), 2):
-    if i < len(e) // 2 + 1:
-        for j in range(0, i + 1):
+for i in range(n // 2):
+    if j % 2 != 0:
+        for j in range(i, n):
             countE1 += e[i][j]
-    else:
-        for j in range(0, len(e)):
-            countE1 += e[i][j]
+for i in range(n // 2):
+    for j in range(n - (i + 1)):
+        countE1 += e[i][j]
+else:
+    for j in range(0, len(e) - i):
+        countE1 += e[i][j]
 print("Сумма чисел в области 1: ", countE1)
 
 f = [[0] * n for _ in range(n)]
@@ -112,7 +118,6 @@ for i in range(len(f)):
     print()
 print()
 
-
 answer = [[0] * n for _ in range(n)]
 for i in range(n):
     for j in range(n):
@@ -136,14 +141,12 @@ for i in range(len(answer)):
     print()
 print()
 
-
-change = [[False] * (n) for _ in range(n)]
+change = [[False] * n for _ in range(n)]
 for i in range(len(f)):
     for j in range(len(f)):
         if change[i][j] == False:
             f[i][j], f[j][i] = f[j][i], f[i][j]
             change[i][j] = change[j][i] = True
-
 
 print("Матрица A^T")
 for i in range(len(a)):
@@ -156,11 +159,10 @@ answer1 = [[0] * n for _ in range(n)]
 for i in range(n):
     for j in range(n):
         for k in range(n):
-            answer1[i][j] += answer[i][k] - k*a[k][j]
+            answer1[i][j] += answer[i][k] - k * a[k][j]
 print("Матрица (K*(A*F))-K*A^T")
 for i in range(len(answer1)):
     for j in range(len(answer1)):
         print("{:4d}".format(answer1[i][j]), end=' ')
     print()
 print()
-
