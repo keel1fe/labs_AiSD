@@ -5,12 +5,13 @@
 
 import re
 
-with open("C://Users//User//Desktop//политех//ура.txt", 'r', encoding="utf8") as file:      #открываем файл
-    line = file.readline()                                                                  # читаем строку
+with open("C://Users//User//Desktop//политех//ура.txt", 'r', encoding="utf8") as file:
+    line = file.readline()
+    file.seek(0)                                                                           # Вернуть указатель файла к началу
 
-    for i in file:                                     
+    for i in file:                                                                         # открываем файл
         index = 0
-        line = i.rstrip()                             
+        line = i.rstrip()                                                                  # читаем строку
         if len(re.findall('000', line)) == 1:
             print("Число:", i)
             for i in re.finditer('000', line):
