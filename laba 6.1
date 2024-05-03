@@ -28,14 +28,12 @@ points = [(1, 7), (2, 18), (3, 3), (1, 4), (10, 15), (80, 64), (120, 100)]
 start_time = time.time()
 combinations: list = generate_point_combinations([point for point in points if len([p for p in points if p[0] == point[0]]) == 1])  # Учитываем только точки с различными x-координатами
 collinear_points = [points for points in combinations if are_points_collinear(points)]
-max_collinear_points = max(collinear_points, key=lambda x: len(x))
 algorithmic_time = time.time() - start_time
 
 # Подход с использованием функций Python
 start_time = time.time()
 combinations: list = generate_point_combinations([point for point in points if len([p for p in points if p[0] == point[0]]) == 1])  # Учитываем только точки с различными x-координатами
 collinear_points = [points for points in combinations if are_points_collinear(points)]
-max_collinear_points = max(collinear_points, key=lambda x: len(x))
 python_functions_time = time.time() - start_time
 
 print("Время выполнения алгоритмического подхода:", algorithmic_time)
