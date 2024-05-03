@@ -1,12 +1,19 @@
+'''
+1 часть – написать программу в соответствии со своим вариантом задания. Написать 2 варианта формирования (алгоритмический и с помощью функций Питона), сравнив по времени их выполнение.
+Вариант 17. На плоскости задано К точек. Сформировать все возможные варианты выбора множества точек из них на проверку того, что они принадлежат одной прямой.
+'''
+
 import itertools
 import timeit
 
+# Генерация всех возможных комбинаций точек
 def generate_point_combinations(points):
     combinations = []
-    for i in range(2, len(points)+1):
+    for i in range(2, len(points)+1):                                              # Рассматриваем комбинации из 2 и более точек
         combinations.extend(list(itertools.combinations(points, i)))
     return combinations
 
+# Проверка, лежат ли точки на одной прямой
 def are_points_collinear(points):
     if len(points) < 3:
         return True
@@ -16,12 +23,14 @@ def are_points_collinear(points):
 
 points = [(1, 1), (2, 2), (3, 3), (4, 4)]
 
+# Алгоритмический подход
 start_time = timeit.timeit()
 combinations = generate_point_combinations(points)
 generate_point_combinations(points)
 collinear_points = [points for points in combinations if are_points_collinear(points)]
 algorithmic_time = timeit.timeit() - start_time
 
+# Подход с использованием функций Python
 start_time = timeit.timeit()
 combinations = [points for i in range(2, len(points)+1) for points in itertools.combinations(points, i)]
 collinear_points = [points for points in combinations if are_points_collinear(points)]
