@@ -4,6 +4,7 @@
 17.	F(1) = 1, F(n) =(-1)n*(F(n–1) /(2n)!-(n + n!)), при четных n > 1 F(n)=sin(n) при нечетных n > 1
 ```
 
+
 import math
 import timeit
 import matplotlib.pyplot as plt
@@ -24,21 +25,18 @@ def dynamic_fact(n):
     return last_factorial
 
 def recursive_factorial(n):
-    if n == 1:
+    if n == 1 and n % 2 == 0:
         return 1
     else:
         return math.sin(n)
 
 
 # Функция для вычисления значения
-step = 1
 def dynamic_F(n, cache={1: 1}):
     if n in cache:
         return cache[n]
     else:
-        global step
-        step *= -1
-        result = step * (dynamic_F(n - 1, cache, step)/ dynamic_fact(2 * n, step)-n+n*dynamic_fact)
+        result = -1 * (dynamic_F(n - 1, cache)/ dynamic_fact(2 * n)-n+n*dynamic_fact)
         cache[n] = result
         return result
 
