@@ -1,0 +1,103 @@
+Требуется для своего варианта второй части л.р. №6 (усложненной программы) разработать реализацию с использованием графического интерфейса.
+В программе должны быть реализованы минимум одно окно ввода, одно окно вывода (со скролингом), одно текстовое поле, одна кнопка.
+
+import tkinter as tk
+from tkinter import scrolledtext
+import itertools
+from turtle import distance
+
+
+
+def generate_combinations_python(points, num_points):
+    return list(itertools.combinations(points, num_points))
+
+
+# Проверка, лежат ли точки на одной прямой
+def are_points_collinear(points):
+    if len(points) <= 2:
+        return True  # Любые две точки считаются лежащими на одной прямой
+
+    for combination in itertools.combinations(points, 2):
+        x1, y1 = combination[0]
+        x2, y2 = combination[1]
+
+        distance = abs(x1 - x2) + abs(y1 - y2)
+        if distance < min_distance:
+            min_distance = distance
+
+    for i in range(2, len(points)):
+        x3, y3 = points[i]
+        if (x2 - x1) * (y3 - y1) != (x3 - x1) * (y2 - y1) and x1 != x2 and x1 != x3 and x2 != x3:
+            return False
+
+    return True
+
+
+def find_points_button_clicked(num_points, entries, distance):
+    points = []
+    for i in range(num_points):
+        x, y = int(entries[i][0].get()), int(entries[i][1].get())
+        points.append((x, y))
+
+    distance = distance(points)
+    distance.delete(1.0, tk.END)
+    distance.insert(tk.INSERT, "Минимальная сумма расстояний между точками:\n")
+    for point in points:
+        distance.insert(tk.INSERT, str(point) + "\n")
+
+
+def main():
+    root = tk.Tk()
+    root.title("Минимальная сумма расстояний между точками")
+
+    frame = tk.Frame(root)
+    frame.pack()
+
+    label = tk.Label(frame, text="Введите количество точек:")
+    label.grid(row=0, column=0)
+
+    entry = tk.Entry(frame)
+    entry.grid(row=0, column=1)
+
+    def create_point_inputs():
+        num_points = int(entry.get())
+        for i in range(num_points):
+            x_label = tk.Label(frame, text=f"Точка {i + 1} (x, y):")
+            x_label.grid(row=i + 1, column=0)
+
+            x_entry = tk.Entry(frame)
+            x_entry.grid(row=i + 1, column=1)
+
+            y_entry = tk.Entry(frame)
+            y_entry.grid(row=i + 1, column=2)
+
+            entries.append((x_entry, y_entry))
+
+        button.grid(row=num_points + 2, column=1)
+
+        create_point_inputs_button.destroy()
+
+    create_point_inputs_button = tk.Button(frame, text="Ввести точки", command=create_point_inputs)
+    create_point_inputs_button.grid(row=1, column=3)
+
+    entries = []
+
+    output_area = scrolledtext.ScrolledText(root, wrap=tk.WORD, width=40, height=10)
+    output_area.pack(pady=10)
+
+    button = tk.Button(frame, text="Найти минимальную сумму расстояний между точками",
+                       command=lambda: find_points_button_clicked(num_points, entries, distance))
+
+    root.update_idletasks()
+
+    width = root.winfo_width()
+    height = root.winfo_height()
+    x_offset = (root.winfo_screenwidth() - width) // 2
+    y_offset = (root.winfo_screenheight() - height) // 2
+    root.geometry(f'+{x_offset}+{y_offset}')
+
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
