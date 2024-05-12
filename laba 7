@@ -17,13 +17,26 @@ def are_points_collinear(points):
     if len(points) <= 2:
         return True  # Любые две точки считаются лежащими на одной прямой
 
+    x_values = [point[0] for point in points]
+    y_values = [point[1] for point in points]
+
+    x1, y1 = points[0]
+    x2, y2 = points[1]
+
+    min_distance = float('inf')
+    min_points = ()
+
     for combination in itertools.combinations(points, 2):
         x1, y1 = combination[0]
         x2, y2 = combination[1]
 
+        if x1 == x2:  # Пропускаем комбинации с одинаковыми x
+            continue
+
         distance = abs(x1 - x2) + abs(y1 - y2)
         if distance < min_distance:
             min_distance = distance
+            min_points = combination
 
     for i in range(2, len(points)):
         x3, y3 = points[i]
