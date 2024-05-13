@@ -4,60 +4,59 @@
 import tkinter as tk
 from tkinter import scrolledtext
 import itertools
-from turtle import distance
-
-
 
 def generate_combinations_python(points, num_points):
     return list(itertools.combinations(points, num_points))
-
 
 # Проверка, лежат ли точки на одной прямой
 def are_points_collinear(points):
     if len(points) <= 2:
         return True  # Любые две точки считаются лежащими на одной прямой
-
-    x_values = [point[0] for point in points]
-    y_values = [point[1] for point in points]
-
     x1, y1 = points[0]
     x2, y2 = points[1]
 
-    min_distance = float('inf')
-    min_points = ()
-
-    for combination in itertools.combinations(points, 2):
-        x1, y1 = combination[0]
-        x2, y2 = combination[1]
-
-        if x1 == x2:  # Пропускаем комбинации с одинаковыми x
-            continue
-
-        distance = abs(x1 - x2) + abs(y1 - y2)
-        if distance < min_distance:
-            min_distance = distance
-            min_points = combination
-
     for i in range(2, len(points)):
         x3, y3 = points[i]
-        if (x2 - x1) * (y3 - y1) != (x3 - x1) * (y2 - y1) and x1 != x2 and x1 != x3 and x2 != x3:
+        if (x2 - x1) * (y3 - y1) != (x3 - x1) * (y2 - y1):
             return False
-
     return True
 
-
-def find_points_button_clicked(num_points, entries, distance):
+def find_points_button_clicked(num_points, entries, output_area):
     points = []
     for i in range(num_points):
         x, y = int(entries[i][0].get()), int(entries[i][1].get())
         points.append((x, y))
 
-    distance = distance(points)
-    distance.delete(1.0, tk.END)
-    distance.insert(tk.INSERT, "Минимальная сумма расстояний между точками:\n")
-    for point in points:
-        distance.insert(tk.INSERT, str(point) + "\n")
+    collinear_combinations = []
+    all_collinear_combinations = []
+    min_distance = float('inf')
+    min_points = ()
 
+    # Генерируем все комбинации из 2 до num_points точек
+    for r in range(2, num_points + 1):
+        combinations = itertools.combinations(points, r)
+        for combo in combinations:
+            if are_points_collinear(combo):
+                collinear_combinations.append(combo)
+                all_collinear_combinations.append(combo)
+                # Вычисляем минимальное расстояние между парами точек
+                for combination in itertools.combinations(combo, 2):
+                    x1, y1 = combination[0]
+                    x2, y2 = combination[1]
+                    distance = abs(x1 - x2) + abs(y1 - y2)
+                    if distance < min_distance:
+                        min_distance = distance
+                        min_points = combination
+
+    output_area.delete(1.0, tk.END)
+    output_area.insert(tk.INSERT, f"Минимальная сумма расстояний между точками: {min_distance}\n")
+    output_area.insert(tk.INSERT, f"Комбинация точек с минимальной суммой расстояний: {min_points}\n")
+    for point in points:
+        output_area.insert(tk.INSERT, str(point) + "\n")
+
+    output_area.insert(tk.INSERT, f"\nКоллинеарные комбинации точек:\n")
+    for i, combo in enumerate(all_collinear_combinations):
+        output_area.insert(tk.INSERT, f"Комбинация {i + 1}: {combo}\n")
 
 def main():
     root = tk.Tk()
@@ -99,18 +98,9 @@ def main():
     output_area.pack(pady=10)
 
     button = tk.Button(frame, text="Найти минимальную сумму расстояний между точками",
-                       command=lambda: find_points_button_clicked(num_points, entries, distance))
-
-    root.update_idletasks()
-
-    width = root.winfo_width()
-    height = root.winfo_height()
-    x_offset = (root.winfo_screenwidth() - width) // 2
-    y_offset = (root.winfo_screenheight() - height) // 2
-    root.geometry(f'+{x_offset}+{y_offset}')
+                       command=lambda: find_points_button_clicked(int(entry.get()), entries, output_area))
 
     root.mainloop()
-
 
 if __name__ == "__main__":
     main()
