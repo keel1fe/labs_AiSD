@@ -111,3 +111,115 @@ print("Время выполнения подхода с использован�
 end_time = time.time()
 execution_time = end_time - start_time
 print("Время выполнения поиска оптимальной комбинации:", execution_time)
+
+
+
+
+другое
+import itertools
+import time
+
+def generate_combinations(points, k, combination=[], all_combinations=[]):
+    if len(combination) == k:
+        all_combinations.append(combination)
+        return
+
+    for point in points:
+        if points not in combination:
+            generate_combinations(points, k, combination + [points], all_combinations)
+    return all_combinations
+
+# Генерация всех возможных комбинаций точек
+def generate_combinations_python(points, k):
+    return list(itertools.combinations(points, k))
+
+# Проверка, лежат ли точки на одной прямой
+def are_points_collinear(points):
+    if len(points) <= 2:
+        return True  # Любые две точки считаются лежащими на одной прямой
+
+    x_values = [point[0] for point in points]
+    y_values = [point[1] for point in points]
+
+    x1, y1 = points[0]
+    x2, y2 = points[1]
+
+    min_distance = float('inf')
+    min_points = ()
+
+    for combination in itertools.combinations(points, 2):
+        x1, y1 = combination[0]
+        x2, y2 = combination[1]
+
+        distance = abs(x1 - x2) + abs(y1 - y2)
+        if distance < min_distance:
+            min_distance = distance
+            min_points = combination
+
+    print("Минимальная сумма расстояний между точками:", min_distance)
+    print("Комбинация точек с минимальной суммой расстояний:", min_points)
+
+
+
+    return True
+
+k = int(input("Введите количество точек: "))
+
+points = []
+def input_point():
+    """Функция для ввода координат точки."""
+    x = float(input("Введите координату x: "))
+    y = float(input("Введите координату y: "))
+    return (x, y)
+
+
+def main():
+
+    for i in range(k):
+        print(f"Введите координаты для точки {i + 1}:")
+        point = input_point()
+        points.append(point)
+
+    print("Вы ввели следующие точки:")
+    for i, point in enumerate(points):
+        print(f"Точка {i + 1}: ({point[0]}, {point[1]})")
+
+    # Генерируем все комбинации из 2 до k точек
+    all_combinations = []
+    for r in range(2, k + 1):
+        all_combinations.extend(generate_combinations_python(points, k))
+
+    # Отфильтровываем коллинеарные комбинации
+    collinear_combinations = [combination for combination in all_combinations if are_points_collinear(combination)]
+
+
+    print("Комбинации точек, которые принадлежат одной прямой:")
+    for i, combination in enumerate(collinear_combinations):
+        print(f"Комбинация {i + 1}: {combination}")
+
+
+main()
+
+# Алгоритмический подход
+start_time = time.time()
+combinations = generate_combinations(points, k)
+collinear_points = [points for points in combinations if are_points_collinear(points)]
+algorithmic_time = time.time() - start_time
+print("Время выполнения алгоритмического подхода:", algorithmic_time)
+
+# Подход с использованием функций Python
+start_time = time.time()
+combinations: list = generate_combinations_python(points, k)
+are_points_collinear = [points for points in combinations if are_points_collinear(points)]
+python_functions_time = time.time() - start_time
+print("Время выполнения подхода с использованием функций Python:", python_functions_time)
+
+end_time = time.time()
+execution_time = end_time - start_time
+print("Время выполнения поиска оптимальной комбинации:", execution_time)
+
+# Проверка коллинеарности точек
+for i in range(2, len(points)):
+    x3, y3 = points[i]
+    if (x2 - x1) * (y3 - y1) != (x3 - x1) * (y2 - y1) and x1 != x2 and x1 != x3 and x2 != x3:
+        return False
