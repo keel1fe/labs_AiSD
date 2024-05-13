@@ -53,3 +53,66 @@ plt.legend()
 plt.title('Сравнение времени вычисления функции F(n)')
 plt.show()
 
+
+
+
+
+
+
+
+
+другое
+import timeit
+import math
+import matplotlib.pyplot as plt
+
+fact = 1
+
+# Рекурсивное вычисление функции
+def recursive_F(n):
+   if n == 1:
+      fact *= n * recursive_F(n - 1)
+      return 1
+   elif n % 2 == 0:
+      fact *= n * recursive_F(n - 1)
+      return (-1)**n * (recursive_F(n - 1) / math.factorial(2 * n) - n + n * math.factorial(n))
+   else:
+      fact *= n * recursive_F(n - 1)
+      return math.sin(n)
+
+# Итеративное вычисление функции
+def iterative_F(n):
+   fact = 1
+   result = 1
+   for i in range(2, n + 1):
+      if i % 2 == 0:
+         fact *= n * iterative_F(n - 1)
+         result = (-1)**i * (result / math.factorial(2 * i) - i + i * math.factorial(i))
+      else:
+         result = math.sin(i)
+   return result
+
+# Функция для записи времени
+def score_time(func, n):
+    return timeit.timeit(lambda: func(n), number=1000)
+
+
+n_values = range(1, 10)
+recursive_times = []
+iterative_times = []
+
+for n in n_values:
+    recursive_times.append(score_time(recursive_F, n))
+    iterative_times.append(score_time(iterative_F, n))
+
+print(f"{'n':<10}{'Рекурсивное время (мс)':<25}{'Итерационно время (мс)':<25}")
+for i, n in enumerate(n_values):
+    print(f"{n:<10}{recursive_times[i]:<25}{iterative_times[i]:<25}")
+
+plt.plot(n_values, recursive_times, label='Рекурсивно')
+plt.plot(n_values, iterative_times, label='Итерационно')
+plt.xlabel('n')
+plt.ylabel('Время (в миллисекундах)')
+plt.legend()
+plt.title('Сравнение времени вычисления функции F(n)')
+plt.show()
