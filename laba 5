@@ -52,9 +52,9 @@ def iterative_F(n):
     F[1] = 1
     for i in range(2, n + 1, 2):
         c *= -1
-        F[i]=c*(F[n-1] / iterative_factorial(2 * n) - n + n * iterative_factorial)
+        F[i]=c*(F[n-1] / iterative_factorial(2 * n) - (n + n * iterative_factorial(n)))
     for i in range(3, n + 1, 2):
-        F[i] = iterative_factorial(n)
+        F[i]= math.sin(n)
     return F[i]
 
 def score_time(func, n):
@@ -80,4 +80,3 @@ plt.ylabel('Время (в миллисекундах)')
 plt.legend()
 plt.title('Сравнение времени вычисления функции F(n)')
 plt.show()
-
