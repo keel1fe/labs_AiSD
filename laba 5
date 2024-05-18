@@ -11,14 +11,14 @@ import math
 
 # Функция для вычисления факториала числа
 last_factorial = 1
-def dynamic_factorial(n):
+def factorial(n):
     global last_factorial
     last_factorial = n * last_factorial
     return last_factorial
 
 # Рекурсивная функция для вычисления факториала
 def recursive_factorial(n):
-    if n == 1:
+    if n == 1 or n==0:
         return 1
     else:
         return n * recursive_factorial(n-1)
@@ -30,18 +30,32 @@ def iterative_factorial(n):
         result *= i
     return result
 
+k=-1
 last_F_value = 1;
-
 # Функция для вычисления значения F
 step = 1
-def dynamic_F(n):
-    global last_F_value
+def recursive_F(n):
+    global last_F_value, k
     if n == 1:
         return 1
-    elif n % 2 == 0:
-        return (-1)**n * (dynamic_F(n - 1) / dynamic_factorial(2 * n) - n + n * dynamic_factorial(n))
-    else:
+    elif n % 2 == 0 and n>1:
+        k *= -1
+        return k*(recursive_F(n - 1) / recursive_factorial(2 * n) - n + n * recursive_factorial(n))
+    elif n > 1 and n % 2 != 0:
         return math.sin(n)
+
+c=-1
+last_factorial = 1
+def iterative_F(n):
+    global c, last_factorial
+    F = [0] * (n + 1)
+    F[1] = 1
+    for i in range(2, n + 1, 2):
+        c *= -1
+        F[i]=c*(F[n-1] / iterative_factorial(2 * n) - n + n * iterative_factorial)
+    for i in range(3, n + 1, 2):
+        F[i] = iterative_factorial(n)
+    return F[i]
 
 def score_time(func, n):
     return timeit.timeit(lambda: func(n), number=1000)
@@ -66,3 +80,4 @@ plt.ylabel('Время (в миллисекундах)')
 plt.legend()
 plt.title('Сравнение времени вычисления функции F(n)')
 plt.show()
+
