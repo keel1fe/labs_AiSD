@@ -1,0 +1,98 @@
+import tkinter as tk
+from tkinter import messagebox
+import matplotlib.pyplot as plt
+import csv
+from collections import defaultdict
+
+class Book:
+    def __init__(self, title, discipline, usage):
+        self.title = title
+        self.discipline = discipline
+        self.usage = usage
+
+    def __str__(self):
+        return f"{self.title}, {self.discipline}, {self.usage}"
+
+class Library:
+    def __init__(self):
+        self.books = []
+
+    def load_books(self, filename):
+        try:
+            with open(filename, 'r', encoding='utf-8') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    if len(row) == 3:
+                        title, discipline, usage = row
+                        self.books.append(Book(title, discipline, usage))
+                    else:
+                        raise ValueError("Неверный формат данных в файле.")
+        except Exception as e:
+            messagebox.showerror("Ошибка", str(e))
+
+    def segment_by_discipline(self):
+        discipline_count = defaultdict(int)
+        for book in self.books:
+            discipline_count[book.discipline] += 1
+        return discipline_count
+
+    def segment_by_usage(self):
+        usage_count = defaultdict(int)
+        for book in self.books:
+            usage_count[book.usage] += 1
+        return usage_count
+
+    def visualize_data(self, data, title):
+        plt.figure(figsize=(8, 6))
+        title_obj = plt.title(title, fontsize=14)
+        title_obj.set_position([0.5, 2])
+        labels = data.keys()
+        sizes = data.values()
+        plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140)
+        plt.subplots_adjust(top=0.9, bottom=0.1, left=0.1, right=0.9, hspace=0.8)
+        plt.axis('equal')
+        plt.show()
+
+
+class LibraryApp:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Библиотека")
+
+        self.center_window(400, 140)
+        self.library = Library()
+        self.label = tk.Label(master, text="Введите имя файла:")
+        self.label.pack()
+        self.filename_entry = tk.Entry(master)
+        self.filename_entry.pack()
+        self.load_button = tk.Button(master, text="Загрузить книги", command=self.load_books)
+        self.load_button.pack()
+        self.segment_discipline_button = tk.Button(master, text="Сегментация по дисциплинам", command=self.segment_by_discipline)
+        self.segment_discipline_button.pack()
+        self.segment_usage_button = tk.Button(master, text="Сегментация по использованию", command=self.segment_by_usage)
+        self.segment_usage_button.pack()
+
+    def center_window(self, width, height):
+        screen_width = self.master.winfo_screenwidth()
+        screen_height = self.master.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        self.master.geometry(f"{width}x{height}+{x}+{y}")
+
+    def load_books(self):
+        filename = self.filename_entry.get()
+        self.library.load_books(filename)
+
+    def segment_by_discipline(self):
+        data = self.library.segment_by_discipline()
+        self.library.visualize_data(data,  "Сегментация по учебным дисциплинам")
+
+    def segment_by_usage(self):
+        data = self.library.segment_by_usage()
+        self.library.visualize_data(data, "Сегментация по использованию книг")
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = LibraryApp(root)
+    root.mainloop()
