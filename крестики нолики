@@ -1,0 +1,131 @@
+from tkinter import *
+from tkinter import messagebox
+import time
+import random
+
+tk = Tk()
+app_running = True
+
+size_canvas_x = 400
+size_canvas_y = 400
+
+# Получаем размеры экрана
+screen_width = tk.winfo_screenwidth()
+screen_height = tk.winfo_screenheight()
+window_width = 400
+window_height = 435
+
+center_x = (screen_width // 2) - (window_width // 2)
+center_y = (screen_height // 2) - (window_height // 2)
+tk.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+
+def on_closing():
+    global app_running
+    if messagebox.askokcancel("Выход из игры", "Хотите выйти из игры?"):
+        app_running = False
+        tk.destroy()
+
+
+tk.protocol("WM_DELETE_WINDOW", on_closing)
+tk.title("Игра крестики-нолики")
+tk.resizable(0, 0)
+tk.wm_attributes("-topmost", 1)
+
+canvas = Canvas(tk, width=size_canvas_x, height=size_canvas_y, bd=0, highlightthickness=0)
+canvas.create_rectangle(0,0,size_canvas_x, size_canvas_y,fill="white")
+canvas.pack()
+
+s_x = 3
+s_y = s_x
+step_x = size_canvas_x // s_x
+step_y = size_canvas_y // s_y
+
+def draw_table():
+    for i in range(0, s_x + 1):
+        canvas.create_line(0, i * step_y, size_canvas_x, i * step_y)
+    for i in range(0,s_y+1):
+         canvas.create_line(i*step_y,0,i*step_y,size_canvas_y)
+
+points = [[-1 for i in range(s_x)] for i in range(s_x)]
+list_ids = []
+draw_table()
+
+def draw_point(x, y, type):
+    size = 10
+    color = "black"
+    if type == 0:  # Нолик
+        color = "red"
+        id = canvas.create_oval(x * step_x + size, y * step_y + size, (x + 1) * step_x - size, (y + 1) * step_y - size, fill="white", outline= color, width=5)
+        list_ids.append(id)
+    if type == 1:
+        color = "blue"
+        id1 = canvas.create_line(x * step_x + size, y * step_y + size, (x + 1) * step_x - size, (y + 1) * step_y - size, fill=color, width=5)
+        id2 = canvas.create_line((x + 1) * step_x - size, y * step_y + size, x * step_x + size, (y + 1) * step_y - size, fill=color, width=5)
+        list_ids.append(id1)
+        list_ids.append(id2)
+
+def add_to_points(event):
+    global points
+    type = 0
+    if event.num == 3:
+        type = 1
+    if points[event.x // step_x][event.y // step_y] == -1:
+        points[event.x // step_x][event.y // step_y] = type
+        draw_point(event.x // step_x, event.y // step_y, type)
+        if check_winner(type):
+            print("Победитель", type)
+            points = [[10 for i in range(s_x)] for i in range(s_x)]
+
+canvas.bind_all("<Button-1>", add_to_points)  # ЛКМ
+canvas.bind_all("<Button-3>", add_to_points)  # ПКМ
+
+def button_press():
+    global list_ids
+    global points
+    for i in list_ids:
+        canvas.delete(i)
+    list_ids = []
+    print(list_ids)
+    points = [[-1 for i in range(s_x)] for i in range(s_x)]
+
+b1 = Button(tk, text="Начать заново!", command=button_press)
+b1.pack(side = BOTTOM)
+
+def check_winner(who):
+    # Проверка строк
+    for j in range(0,s_y):
+        win = True
+        for i in range(0,s_x):
+            if points[j][i] != who:
+                win = False
+        if win:
+            return True
+    # Проверка столбцов
+    for j in range(0,s_y):
+        win = True
+        for i in range(0,s_x):
+            if points[i][j] != who:
+                win = False
+        if win:
+            return True
+    # Проверка главной диагонали (слева направо)
+    win = True
+    for i in range(0,s_y):
+        if points[i][i] != who:
+            win = False
+    if win:
+        return True
+    # Проверка обратной диагонали (справа налево)
+    win = True
+    for i in range(0, s_y):
+        if points[i][s_x - 1 - i] != who:  # Проверка обратной диагонали
+            win = False
+    if win:
+        return True
+    return False
+
+while app_running:
+    if app_running:
+        tk.update_idletasks()
+        tk.update()
+    time.sleep(0.005)
