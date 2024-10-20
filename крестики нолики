@@ -25,14 +25,13 @@ def on_closing():
         app_running = False
         tk.destroy()
 
-
 tk.protocol("WM_DELETE_WINDOW", on_closing)
 tk.title("Игра крестики-нолики")
 tk.resizable(0, 0)
 tk.wm_attributes("-topmost", 1)
 
 canvas = Canvas(tk, width=size_canvas_x, height=size_canvas_y, bd=0, highlightthickness=0)
-canvas.create_rectangle(0,0,size_canvas_x, size_canvas_y,fill="white")
+canvas.create_rectangle(0, 0, size_canvas_x, size_canvas_y, fill="white")
 canvas.pack()
 
 s_x = 3
@@ -43,8 +42,8 @@ step_y = size_canvas_y // s_y
 def draw_table():
     for i in range(0, s_x + 1):
         canvas.create_line(0, i * step_y, size_canvas_x, i * step_y)
-    for i in range(0,s_y+1):
-         canvas.create_line(i*step_y,0,i*step_y,size_canvas_y)
+    for i in range(0, s_y + 1):
+        canvas.create_line(i * step_y, 0, i * step_y, size_canvas_y)
 
 points = [[-1 for i in range(s_x)] for i in range(s_x)]
 list_ids = []
@@ -53,31 +52,77 @@ draw_table()
 def draw_point(x, y, type):
     size = 10
     color = "black"
-    if type == 0:  # Нолик
+    if type == 0:  # Нолик (человек)
         color = "red"
-        id = canvas.create_oval(x * step_x + size, y * step_y + size, (x + 1) * step_x - size, (y + 1) * step_y - size, fill="white", outline= color, width=5)
+        id = canvas.create_oval(x * step_x + size, y * step_y + size, (x + 1) * step_x - size, (y + 1) * step_y - size, fill="white", outline=color, width=5)
         list_ids.append(id)
-    if type == 1:
+    if type == 1:  # Крестик (компьютер)
         color = "blue"
         id1 = canvas.create_line(x * step_x + size, y * step_y + size, (x + 1) * step_x - size, (y + 1) * step_y - size, fill=color, width=5)
         id2 = canvas.create_line((x + 1) * step_x - size, y * step_y + size, x * step_x + size, (y + 1) * step_y - size, fill=color, width=5)
         list_ids.append(id1)
         list_ids.append(id2)
 
+def check_winning_move(type):
+    for x in range(s_x):
+        for y in range(s_y):
+            if points[x][y] == -1:
+                points[x][y] = type
+                if check_winner(type):
+                    points[x][y] = -1
+                    return x, y
+                points[x][y] = -1
+    return None
+
+def computer_move():
+    global points
+
+    # 1. Попробовать выиграть
+    win_move = check_winning_move(1)
+    if win_move:
+        x, y = win_move
+        points[x][y] = 1  # Компьютер играет крестиком (1)
+        draw_point(x, y, 1)
+        if check_winner(1):
+            print("Победитель: компьютер")
+            points = [[10 for _ in range(s_x)] for _ in range(s_x)]
+        return
+
+    # 2. Блокировать ход игрока
+    block_move = check_winning_move(0)
+    if block_move:
+        x, y = block_move
+        points[x][y] = 1  # Блокируем игрока
+        draw_point(x, y, 1)
+        return
+
+    # 3. Если свободна центральная клетка, занять её
+    if points[1][1] == -1:
+        points[1][1] = 1
+        draw_point(1, 1, 1)
+        return
+
+    # 4. Делать случайный ход
+    empty_cells = [(i, j) for i in range(s_x) for j in range(s_y) if points[i][j] == -1]
+    if empty_cells:
+        x, y = random.choice(empty_cells)
+        points[x][y] = 1  # Компьютер играет крестиком (1)
+        draw_point(x, y, 1)
+
 def add_to_points(event):
     global points
-    type = 0
-    if event.num == 3:
-        type = 1
-    if points[event.x // step_x][event.y // step_y] == -1:
-        points[event.x // step_x][event.y // step_y] = type
-        draw_point(event.x // step_x, event.y // step_y, type)
+    type = 0  # Игрок играет ноликами (0)
+    x, y = event.x // step_x, event.y // step_y
+    if points[x][y] == -1:
+        points[x][y] = type
+        draw_point(x, y, type)
         if check_winner(type):
-            print("Победитель", type)
-            points = [[10 for i in range(s_x)] for i in range(s_x)]
+            print("Победитель: игрок")
+            points = [[10 for _ in range(s_x)] for _ in range(s_x)]
+        else:
+            computer_move()  # Ход компьютера после хода игрока
 
 canvas.bind_all("<Button-1>", add_to_points)  # ЛКМ
-canvas.bind_all("<Button-3>", add_to_points)  # ПКМ
 
 def button_press():
     global list_ids
@@ -85,42 +130,25 @@ def button_press():
     for i in list_ids:
         canvas.delete(i)
     list_ids = []
-    print(list_ids)
-    points = [[-1 for i in range(s_x)] for i in range(s_x)]
+    points = [[-1 for _ in range(s_x)] for _ in range(s_x)]
 
-b1 = Button(tk, text="Начать заново!", command=button_press)
-b1.pack(side = BOTTOM)
+b1 = Button(tk, text="Начать заново", command=button_press)
+b1.pack(side=BOTTOM)
 
 def check_winner(who):
     # Проверка строк
-    for j in range(0,s_y):
-        win = True
-        for i in range(0,s_x):
-            if points[j][i] != who:
-                win = False
-        if win:
+    for j in range(s_y):
+        if all(points[j][i] == who for i in range(s_x)):
             return True
     # Проверка столбцов
-    for j in range(0,s_y):
-        win = True
-        for i in range(0,s_x):
-            if points[i][j] != who:
-                win = False
-        if win:
+    for j in range(s_x):
+        if all(points[i][j] == who for i in range(s_y)):
             return True
     # Проверка главной диагонали (слева направо)
-    win = True
-    for i in range(0,s_y):
-        if points[i][i] != who:
-            win = False
-    if win:
+    if all(points[i][i] == who for i in range(s_x)):
         return True
     # Проверка обратной диагонали (справа налево)
-    win = True
-    for i in range(0, s_y):
-        if points[i][s_x - 1 - i] != who:  # Проверка обратной диагонали
-            win = False
-    if win:
+    if all(points[i][s_x - 1 - i] == who for i in range(s_x)):
         return True
     return False
 
