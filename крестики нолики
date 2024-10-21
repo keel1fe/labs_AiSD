@@ -74,6 +74,12 @@ def check_winning_move(type):
                 points[x][y] = -1
     return None
 
+def is_draw():
+    """Проверяет, заполнено ли игровое поле (ничья)."""
+    for row in points:
+        if -1 in row:
+            return False
+    return True
 def computer_move():
     global points
 
@@ -119,8 +125,14 @@ def add_to_points(event):
         if check_winner(type):
             print("Победитель: игрок")
             points = [[10 for _ in range(s_x)] for _ in range(s_x)]
+        elif is_draw():
+            print("Ничья")
+            points = [[10 for _ in range(s_x)] for _ in range(s_x)]
         else:
             computer_move()  # Ход компьютера после хода игрока
+            if is_draw():
+                print("Ничья!")
+                points = [[10 for _ in range(s_x)] for _ in range(s_x)]
 
 canvas.bind_all("<Button-1>", add_to_points)  # ЛКМ
 
@@ -132,7 +144,7 @@ def button_press():
     list_ids = []
     points = [[-1 for _ in range(s_x)] for _ in range(s_x)]
 
-b1 = Button(tk, text="Начать заново", command=button_press)
+b1 = Button(tk, text="Начать заново!", command=button_press)
 b1.pack(side=BOTTOM)
 
 def check_winner(who):
