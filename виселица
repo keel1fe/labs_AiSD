@@ -1,0 +1,142 @@
+from tkinter import  *
+import random
+from tkinter import Label
+
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 800
+margin = 120
+bg_color = 'white'
+lines_col = 'black'
+bin_color = 'white'
+txt_color = 'black'
+spec_color = 'black'
+head_color = '#6153CC'
+hand_color = '#66101F'
+foot_color = '#417B5A'
+fg_color = '#FFD400'
+label_word = []
+btn_alpha = []
+
+
+def start_pos_men():
+    line_1 = canvas.create_line(margin,WINDOW_HEIGHT - margin, margin, margin, width=4, fill= lines_col)
+    line_2 = canvas.create_line(margin, margin, WINDOW_WIDTH // 3, margin, width=4, fill= lines_col )
+    line_3 = canvas.create_line(WINDOW_WIDTH // 3, margin, WINDOW_WIDTH // 3, margin * 2, width=4, fill= lines_col)
+    line_4 = canvas.create_line(margin + 1, WINDOW_HEIGHT - margin, WINDOW_WIDTH // 5, WINDOW_HEIGHT - margin,
+                                width=4, fill=lines_col)
+def start_pop_alphabet():
+    shift_x = shift_y = 0
+    count = 0
+
+    for c in range(ord('А'), ord('Я') - 1):
+        btn = Button(text=chr(c), bg=bin_color, foreground=txt_color, font='Arial 19', relief=SOLID)
+        btn.place(x=WINDOW_HEIGHT - margin * 2 + shift_x, y=margin * 3 - shift_y)
+        btn.bind('<Button-1>', lambda event: check_alpha(event, word))
+        btn_alpha.append(btn)
+        shift_x += 65
+        count += 1
+
+        if (count == 8):
+           shift_x = count = 0
+           shift_y -= 65
+
+def start_word():
+    f = open('D:\Programming\PyCharm Projects\labs_AiSD\words.txt')
+    count = 0
+    for s in f:
+        count += 1
+    num_word = random.randint(1, count)
+    word = ''
+    count = 0
+    f = open('words.txt', encoding='utf-8')
+    for s in f:
+        count += 1
+        if(count == num_word):
+            word = s.strip()
+
+    word = word.upper()
+    return word
+
+def start_pos_word(word):
+    shift = 0
+
+    for i in  range(len(word)):
+        label_under = Label(window, text = '_', font='Arial 24', bg=bg_color, fg= fg_color)
+        label_under.place(x=WINDOW_HEIGHT-margin*2 + shift, y=margin * 2.5)
+        shift += 50
+        label_word.append(label_under)
+
+def draw(lifes):
+    if lifes == 5:
+        head = canvas.create_oval(WINDOW_WIDTH // 3 - 60, margin * 1.5, WINDOW_WIDTH // 3 + 60, margin * 2.5, fill=head_color)
+    elif lifes == 4:
+        body = canvas.create_oval(WINDOW_WIDTH // 3 - 25, margin * 2.5, WINDOW_WIDTH // 3 + 25, margin * 5, fill=head_color)
+    elif lifes == 3:
+        l_hand = canvas.create_line(WINDOW_WIDTH // 3 - 15, margin * 3.5, WINDOW_WIDTH // 3 - 105, margin * 2.4, width=6, fill=hand_color)
+    elif lifes == 2:
+        r_hand = canvas.create_line(WINDOW_WIDTH // 3 + 15, margin * 3.5, WINDOW_WIDTH // 3 + 105, margin * 2.4, width=6, fill=hand_color)
+    elif lifes == 1:
+        l_foot = canvas.create_line(WINDOW_WIDTH // 3 - 15, margin * 4.5, WINDOW_WIDTH // 3 - 90, margin * 6, width=7, fill=foot_color)
+    elif lifes == 0:
+        l_foot = canvas.create_line(WINDOW_WIDTH // 3 + 15, margin * 4.5, WINDOW_WIDTH // 3 + 90, margin * 6, width=7, fill=foot_color)
+        game_over('lose')
+
+
+def check_alpha(event, word):
+    alpha = event.widget['text']
+    pos = [i for i, letter in enumerate(word) if letter == alpha]
+
+    if pos:
+        for i in pos:
+            label_word[i].config(text=word[i])
+
+        if all(label['text'].isalpha() for label in label_word):
+            game_over('win')
+    else:
+        lifes = int(label_life.cget('text')) - 1
+        label_life.config(text=str(lifes))
+        draw(lifes)
+        if lifes == 0:
+            game_over('lose')
+
+def game_over(status):
+    for btn in btn_alpha:
+        btn.destroy()
+
+    if (status == 'win'):
+        canvas.create_text(canvas.winfo_width()/2 + 100, canvas.winfo_height()/2, font=('Futura PT Heave', 50), text='Вы победили', fill=spec_color)
+    else:
+        canvas.create_text(canvas.winfo_width() / 2 + 180, canvas.winfo_height() / 2, font=('Futura PT Heave', 25),
+                           text='В следующий раз обязательно повезет', fill=spec_color)
+
+window = Tk()
+window.title('Виселица')
+window.resizable(False,False)
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+
+# Вычисляем координаты центра
+x = (screen_width // 2) - (WINDOW_WIDTH // 2)
+y = (screen_height // 2) - (WINDOW_HEIGHT // 2)
+
+# Устанавливаем геометрию окна
+window.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}+{x}+{y}')
+
+lifes = 6
+
+label_text = Label(window, text='Жизни:', font=('Futura PT Heave', 40), foreground=txt_color)
+label_text.place(x=930, y=10)
+label_life = Label(window, text='{}'.format(lifes), font=('Futura PT Heave', 40), foreground=txt_color)
+label_life.place(x=1120, y=10)
+
+canvas = Canvas(window, bg=bg_color, height=WINDOW_HEIGHT, width= WINDOW_WIDTH)
+canvas.place(x=0, y=70)
+
+window.geometry('1200x800')
+
+start_pos_men()
+start_pop_alphabet()
+word = start_word()
+start_pos_word(word)
+
+window.mainloop()
