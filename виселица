@@ -28,7 +28,7 @@ def start_pop_alphabet():
     shift_x = shift_y = 0
     count = 0
 
-    for c in range(ord('А'), ord('Я') - 1):
+    for c in range(ord('А'), ord('Я') + 1):
         btn = Button(text=chr(c), bg=bin_color, foreground=txt_color, font='Arial 19', relief=SOLID)
         btn.place(x=WINDOW_HEIGHT - margin * 2 + shift_x, y=margin * 3 - shift_y)
         btn.bind('<Button-1>', lambda event: check_alpha(event, word))
